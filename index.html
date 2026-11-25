@@ -39,6 +39,7 @@ input::placeholder{color:var(--mute)}
 .sugg li:last-child{border-bottom:0}
 .sugg li[aria-selected=true],.sugg li:hover{background:var(--panel)}
 .sugg small{color:var(--gold);white-space:nowrap;font-size:14px}
+.sugg li.topic span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:9px;border:1.5px solid var(--gold);border-radius:50%;transform:translateY(-1px)}
 .sugg li.person span::before{content:"";display:inline-block;width:7px;height:7px;margin-right:9px;transform:rotate(45deg) translateY(-2px);background:var(--gold)}
 .chips{display:flex;gap:4px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none;align-items:center}
 .chip{flex:none;min-height:40px;padding:0 12px;border:0;border-radius:3px;background:transparent;color:var(--ivory);font:400 15px 'Josefin Sans',sans-serif;cursor:pointer}
@@ -116,7 +117,7 @@ dd{margin:2px 0 0}
    <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#c9a94a" stroke-width="1.4"><rect x="6" y="17" width="28" height="17"/><path d="M6 17l1-7 27-4 1 6z"/><path d="M12 9.2l3 6.8M19 8.2l3 6.8M26 7.2l3 6.8"/><path d="M6 23h28"/><path d="M10 28h10"/></svg><span>Mes fiches films</span></div>
    <form id="f" autocomplete="off" role="search">
     <div class="pill">
-     <label for="q"><input id="q" type="search" placeholder="Un film, un réalisateur ou un acteur" aria-label="Rechercher un film, un réalisateur ou un acteur" aria-autocomplete="list" aria-controls="sugg"></label>
+     <label for="q"><input id="q" type="search" placeholder="Un film, une personne ou un thème" aria-label="Rechercher un film, un réalisateur, un acteur ou un thème" aria-autocomplete="list" aria-controls="sugg"></label>
      <button class="go" id="go" type="submit" aria-label="Voir la fiche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></button>
     </div>
     <ul id="sugg" class="sugg" role="listbox" hidden></ul>
@@ -266,6 +267,32 @@ function roleLabel(p){
  if(a)parts.push(a>1?`${a} films comme acteur`:'1 film comme acteur');
  return parts.join(' · ');
 }
+let genres=[];
+function buildGenres(){
+ const m=new Map();
+ for(const f of films)String(f.genre||'').split(',').forEach(g=>{g=g.trim();if(!g)return;const k=norm(g);let e=m.get(k);if(!e){e={name:g.charAt(0).toUpperCase()+g.slice(1),k,films:[]};m.set(k,e)}if(!e.films.includes(f))e.films.push(f)});
+ genres=[...m.values()];
+}
+function genreMatches(q){
+ const n=norm(q);if(n.length<3)return [];
+ return genres.filter(g=>g.k.includes(n)).sort((a,b)=>(a.k.startsWith(n)?0:1)-(b.k.startsWith(n)?0:1)||b.films.length-a.films.length).slice(0,3);
+}
+function themeFilms(q){
+ const n=norm(q);if(n.length<4)return [];
+ const re=new RegExp('(^| )'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+ return films.filter(f=>re.test(norm(f.genre+' '+f.themes)));
+}
+function showList(title,tag,meta,list,heading,sub){
+ const all=[...list].sort((x,y)=>(+y.note)-(+x.note)||(+y.annee||0)-(+x.annee||0));
+ const avg=all.reduce((s,f)=>s+(+f.note||0),0)/all.length;
+ const card=f=>`<button type="button" class="vcard" data-t="${esc(f.titre)}"><b>${esc(f.titre)}</b><span class="who">${esc([f.real,f.annee].filter(Boolean).join(' · '))}</span><span class="vn"><span>${esc(fmtN(f.note))}</span><small>sur 5</small></span></button>`;
+ $('out').innerHTML=`${marquee({titre:title},tag,meta)}<div class="grid"><div><section class="vein" style="margin-top:0"><h2>${esc(heading)}</h2><p class="sub">${esc(sub)}</p><div class="vgrid">${all.map(card).join('')}</div></section></div>
+ <aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne de vos notes')}<p class="fine">Sur ${all.length} film${all.length>1?'s':''} de votre tableau.</p></div></aside></div>`;
+ scrollTo({top:0,behavior:'smooth'});
+}
+const plural=n=>`${n} film${n>1?'s':''}`;
+function showGenre(g){showList(g.name,'Genre',plural(g.films.length),g.films,`Vos films de ce genre`,'Classés de votre meilleure note à la moins bonne.')}
+function showTheme(q,list){showList(`« ${q} »`,'Thème',plural(list.length),list,'Films associés à ce thème','Films dont le genre ou les thèmes contiennent ce mot, du mieux noté au moins bien noté.')}
 function showPerson(p){
  const all=[...new Set([...p.real,...p.act])].sort((x,y)=>(+y.note)-(+x.note)||(+y.annee||0)-(+x.annee||0));
  const avg=all.reduce((s,f)=>s+(+f.note||0),0)/all.length;
@@ -280,20 +307,25 @@ function search(q){
  const pe=people.find(p=>p.k===norm(q));if(pe){showPerson(pe);return}
  const m=matches(q);if(m.length===1){showRated(m[0].f);$('q').value=m[0].f.titre;return}
  const pm=peopleMatches(q);if(!m.length&&pm.length===1){$('q').value=pm[0].name;showPerson(pm[0]);return}
+ const ge=genres.find(g=>g.k===norm(q));if(ge){showGenre(ge);return}
+ if(!m.length&&!pm.length){const tf=themeFilms(q);if(tf.length){showTheme(q,tf);return}}
  if(sample)ask(q);else showEmpty(q,'Ce film n\'est pas dans votre tableau.');
 }
 let sel=-1,cur=[];
 function hideSugg(){$('sugg').hidden=true;sel=-1}
 function renderSugg(){
  const q=$('q').value;
- cur=[...matches(q).slice(0,5).map(x=>({t:'f',f:x.f})),...peopleMatches(q).map(p=>({t:'p',p}))];
+ cur=[...matches(q).slice(0,5).map(x=>({t:'f',f:x.f})),...peopleMatches(q).map(p=>({t:'p',p})),...genreMatches(q).map(g=>({t:'g',g}))];
+ {const tf=themeFilms(q);if(tf.length&&!genreMatches(q).some(g=>g.k===norm(q)))cur.push({t:'k',q:q.trim(),films:tf})}
  if(!cur.length||!q.trim()){hideSugg();return}
  $('sugg').innerHTML=cur.map((x,i)=>x.t==='f'
   ?`<li role="option" aria-selected="${i===sel}" data-i="${i}"><span>${esc(x.f.titre)}</span><small>${esc(x.f.annee??'')} · ${esc(fmtN(x.f.note))}/5</small></li>`
-  :`<li role="option" aria-selected="${i===sel}" data-i="${i}" class="person"><span>${esc(x.p.name)}</span><small>${esc(roleLabel(x.p))}</small></li>`).join('');
+  :x.t==='p'?`<li role="option" aria-selected="${i===sel}" data-i="${i}" class="person"><span>${esc(x.p.name)}</span><small>${esc(roleLabel(x.p))}</small></li>`
+  :x.t==='g'?`<li role="option" aria-selected="${i===sel}" data-i="${i}" class="topic"><span>Genre : ${esc(x.g.name)}</span><small>${esc(plural(x.g.films.length))}</small></li>`
+  :`<li role="option" aria-selected="${i===sel}" data-i="${i}" class="topic"><span>Thème : « ${esc(x.q)} »</span><small>${esc(plural(x.films.length))}</small></li>`).join('');
  $('sugg').hidden=false;
 }
-const pick=x=>{hideSugg();if(x.t==='p'){$('q').value=x.p.name;showPerson(x.p)}else{$('q').value=x.f.titre;showRated(x.f)}};
+const pick=x=>{hideSugg();if(x.t==='p'){$('q').value=x.p.name;showPerson(x.p)}else if(x.t==='g'){$('q').value=x.g.name;showGenre(x.g)}else if(x.t==='k'){showTheme(x.q,x.films)}else{$('q').value=x.f.titre;showRated(x.f)}};
 $('q').addEventListener('input',()=>{sel=-1;renderSugg()});
 $('q').addEventListener('keydown',e=>{
  if($('sugg').hidden)return;
@@ -309,7 +341,7 @@ $('f').addEventListener('submit',e=>{e.preventDefault();search($('q').value)});
 fetch('films.json').then(r=>r.json()).then(d=>{
  films=d.map(r=>Object.fromEntries(K.map((k,i)=>[k,r[i]])));
  idx=films.map(f=>({n:norm(f.titre),f}));
- buildPeople();
+ buildPeople();buildGenres();
  films.forEach(f=>{const m=String(f.remarques||'').match(/Titre original\s*:\s*([^.;(]+)/i);if(m&&norm(m[1])!==norm(f.titre))idx.push({n:norm(m[1]),f})});
  const avg=films.reduce((s,f)=>s+(+f.note||0),0)/films.length;
  $('stat').textContent=`${films.length} films notés · moyenne ${avg.toFixed(1).replace('.',',')}`;
