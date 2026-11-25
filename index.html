@@ -19,18 +19,17 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Josefin Sans',system-ui,sans-serif;overflow-x:clip;min-height:100vh;background-image:repeating-linear-gradient(90deg,transparent 0 46px,rgba(201,169,74,.05) 46px 47px)}
 .wrap{max-width:1120px;margin:0 auto;padding:0 max(4vw,16px)}
 header{background:var(--deep);border-bottom:1px solid var(--gold);box-shadow:0 4px 0 -1px var(--deep),0 5px 0 -1px var(--gold)}
-.bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px;padding:18px 0 14px}
+.bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:28px;padding:18px 0 14px}
 .brand{display:flex;align-items:center;gap:10px;font:700 20px/1 'Josefin Sans',sans-serif;color:var(--gold2);white-space:nowrap}
 .brand svg{width:34px;height:34px}
 .stat{font-size:14px;color:var(--mute);white-space:nowrap}
-form{position:relative;max-width:560px;width:100%;justify-self:center}
-.pill{display:flex;align-items:center;gap:8px;border:1px solid var(--gold);background:var(--panel);padding:6px 6px 6px 18px}
+form{position:relative;width:100%}
+.pill{display:flex;align-items:stretch;border:1px solid var(--gold);background:var(--panel);height:52px}
 .pill:focus-within{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(230,207,134,.35)}
-.pill label{display:flex;flex-direction:column;flex:1}
-.pill small{font-size:13px;font-weight:600;color:var(--gold)}
-input{border:0;outline:0;background:transparent;font:17px 'Josefin Sans',sans-serif;color:var(--ivory);padding:2px 0;min-height:28px;width:100%}
+.pill label{display:flex;align-items:center;flex:1;padding:0 18px}
+input{border:0;outline:0;background:transparent;font:18px/1 'Josefin Sans',sans-serif;color:var(--ivory);padding:0;height:100%;width:100%}
 input::placeholder{color:var(--mute)}
-.go{min-height:46px;padding:0 18px;border:0;background:var(--gold);color:var(--deep);font:700 15px 'Josefin Sans',sans-serif;cursor:pointer;flex:none}
+.go{min-height:0;padding:0 22px;border:0;background:var(--gold);color:var(--deep);font:700 15px 'Josefin Sans',sans-serif;cursor:pointer;flex:none}
 .go:hover{background:var(--gold2)}
 .go:focus-visible,.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
 .go:disabled{opacity:.6;cursor:wait}
@@ -115,7 +114,7 @@ dd{margin:2px 0 0}
    <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#c9a94a" stroke-width="1.4"><path d="M4 34h32"/><path d="M8 34a12 12 0 0 1 24 0"/><path d="M12.5 34a7.5 7.5 0 0 1 15 0"/><path d="M20 34V8M20 34L9 13M20 34l11-21M20 34L5 22M20 34l15-12"/></svg><span>Mes fiches films</span></div>
    <form id="f" autocomplete="off" role="search">
     <div class="pill">
-     <label for="q"><small>Film</small><input id="q" type="search" placeholder="Rechercher un titre" aria-autocomplete="list" aria-controls="sugg"></label>
+     <label for="q"><input id="q" type="search" placeholder="Rechercher un film" aria-label="Rechercher un film" aria-autocomplete="list" aria-controls="sugg"></label>
      <button class="go" id="go" type="submit">Voir la fiche</button>
     </div>
     <ul id="sugg" class="sugg" role="listbox" hidden></ul>
