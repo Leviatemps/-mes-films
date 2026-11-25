@@ -135,7 +135,15 @@ dd{margin:2px 0 0}
 @keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
 @media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}}
-@media(max-width:560px){input{font-size:16px}.pill label{padding:0 14px}.brand span{display:none}.disc{width:160px;height:160px}.disc b{font-size:54px}}
+@media(max-width:560px){input{font-size:16px}.pill label{padding:0 14px}.brand span{display:none}.bar{gap:16px;padding:14px 0 10px}
+.disc{width:130px;height:130px;margin:6px auto 4px}.disc b{font-size:44px}.disc small{font-size:12px}.medal .fine{font-size:13px}
+.grid{margin-top:28px;gap:24px}
+.sugg li{flex-direction:column;gap:2px;padding:10px}.sugg small{white-space:normal;font-size:13px}
+.facts{grid-template-columns:1fr 1fr;gap:0 18px}.facts dd{font-size:16px}
+.vgrid{grid-template-columns:1fr 1fr;gap:10px}.vcard{padding:12px 12px 10px;min-height:0}.vcard b{font-size:16px}.vcard .who{font-size:13px}.vcard .vn span{font-size:22px}.vcard .vn small{font-size:12px}
+.hist{height:150px;gap:4px}.hist span{font-size:16px}.hist em{font-size:12px}
+.chip{font-size:14px;padding:0 8px;min-height:36px}
+.home .vein+.vein,.vein{margin-top:40px}.vein h2{font-size:22px}}
 </style>
 </head>
 <body>
@@ -393,6 +401,7 @@ $('q').addEventListener('keydown',e=>{
 });
 $('sugg').addEventListener('mousedown',e=>{const li=e.target.closest('li');if(!li)return;e.preventDefault();pick(cur[+li.dataset.i])});
 $('q').addEventListener('blur',()=>setTimeout(hideSugg,100));
+if(matchMedia('(max-width:560px)').matches)$('q').placeholder='Film, personne ou thème';
 $('f').addEventListener('submit',e=>{e.preventDefault();search($('q').value)});
 
 fetch('films.json').then(r=>r.json()).then(d=>{
