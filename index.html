@@ -19,10 +19,9 @@ html,body{margin:0}
 body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Josefin Sans',system-ui,sans-serif;overflow-x:clip;min-height:100vh}
 .wrap{max-width:1120px;margin:0 auto;padding:0 max(4vw,16px)}
 header{background:var(--deep);border-bottom:1px solid var(--line)}
-.bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:28px;padding:18px 0 14px}
+.bar{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:28px;padding:18px 0 14px}
 .brand{display:flex;align-items:center;gap:10px;font:700 20px/1 'Josefin Sans',sans-serif;color:var(--gold2);white-space:nowrap}
 .brand svg{width:34px;height:34px}
-.stat{font-size:14px;color:var(--mute);white-space:nowrap}
 form{position:relative;width:100%}
 .pill{display:flex;align-items:stretch;border:1px solid var(--gold);background:var(--panel);height:52px}
 .pill:focus-within{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(230,207,134,.35)}
@@ -134,7 +133,7 @@ dd{margin:2px 0 0}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
 @keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
-@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}.bar{grid-template-columns:auto minmax(0,1fr)}.stat{display:none}}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}}
 @media(max-width:560px){.brand span{display:none}.disc{width:160px;height:160px}.disc b{font-size:54px}}
 </style>
 </head>
@@ -150,7 +149,6 @@ dd{margin:2px 0 0}
     </div>
     <ul id="sugg" class="sugg" role="listbox" hidden></ul>
    </form>
-   <div class="stat" id="stat"></div>
   </div>
   <div class="chips" id="chips"></div>
  </div>
@@ -342,7 +340,7 @@ function showHome(){
  const gs=genres.filter(g=>g.films.length>=5).map(g=>({g,a:avgOf(g.films)})).sort((x,y)=>y.a-x.a);
  const row=(attr,name,n,a)=>`<button type="button" ${attr}><b>${esc(name)}<small>${esc(plural(n))}</small></b><span>${esc(fmtN(a.toFixed(1)))}</span></button>`;
  const grow=({g,a})=>row(`data-g="${esc(g.k)}"`,g.name,g.films.length,a);
- $('out').innerHTML=`${marquee({titre:'Mes fiches films'},'',`${films.length} films notés · moyenne ${fmtN(avg.toFixed(1))} sur 5`)}<div class="grid home"><div>
+ $('out').innerHTML=`${marquee({titre:'Mes fiches films'},'',`${films.length} films notés`)}<div class="grid home"><div>
  <section class="vein"><h2>Vos notes</h2><p class="sub">Combien de films à chaque note. Touchez une barre pour voir les films.</p><div class="hist">${hist}</div></section>
  <section class="vein"><h2>Vos coups de cœur</h2><p class="sub">Les derniers films que vous avez notés 5 sur 5.</p><div class="vgrid">${fav.slice(0,8).map(vc).join('')}</div>${fav.length>8?`<button type="button" class="more" data-n="5">Voir les ${fav.length} films notés 5 sur 5</button>`:''}</section>
  <section class="vein"><h2>Vos réalisateurs les plus sûrs</h2><p class="sub">Moyenne de vos notes, pour les réalisateurs dont vous avez vu au moins trois films.</p><div class="rows">${dirs.map(({p,a})=>row(`data-p="${esc(p.k)}"`,p.name,p.real.length,a)).join('')}</div></section>
@@ -402,10 +400,9 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  buildPeople();buildGenres();
  films.forEach(f=>{const m=String(f.remarques||'').match(/Titre original\s*:\s*([^.;(]+)/i);if(m&&norm(m[1])!==norm(f.titre))idx.push({n:norm(m[1]),f})});
  const avg=films.reduce((s,f)=>s+(+f.note||0),0)/films.length;
- $('stat').textContent=`${films.length} films notés · moyenne ${avg.toFixed(1).replace('.',',')}`;
  const all=films.map((f,i)=>i).reverse();
  const one=all.map(i=>`<button type="button" class="chip" data-i="${i}">${esc(films[i].titre)}</button>`).join('');
- $('chips').innerHTML=`<span class="chiplbl">Vos ${films.length} films</span><div class="track"><div class="belt">${one}<div aria-hidden="true" style="display:flex">${one.replace(/<button /g,'<button tabindex="-1" ')}</div></div></div>`;
+ $('chips').innerHTML=`<div class="track"><div class="belt">${one}<div aria-hidden="true" style="display:flex">${one.replace(/<button /g,'<button tabindex="-1" ')}</div></div></div>`;
  requestAnimationFrame(()=>{const b=document.querySelector('.belt');b.style.setProperty('--dur',(b.scrollWidth/2/45).toFixed(0)+'s')});
  $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;b.blur();const tr=b.closest('.track');tr.classList.add('run');tr.onmouseleave=()=>tr.classList.remove('run');const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
  showHome();
