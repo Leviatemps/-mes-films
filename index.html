@@ -349,7 +349,7 @@ function showHome(){
  const gs=genres.filter(g=>g.films.length>=5).map(g=>({g,a:avgOf(g.films)})).sort((x,y)=>y.a-x.a);
  const row=(attr,name,n,a)=>`<button type="button" ${attr}><b>${esc(name)}<small>${esc(plural(n))}</small></b><span>${esc(fmtN(a.toFixed(1)))}</span></button>`;
  const grow=({g,a})=>row(`data-g="${esc(g.k)}"`,g.name,g.films.length,a);
- $('out').innerHTML=`${marquee({titre:'Mes fiches films'},'',`${films.length} films notés`)}<div class="grid home"><div>
+ $('out').innerHTML=`${marquee({titre:'Le 7ème art'},'',`${films.length} films notés`)}<div class="grid home"><div>
  <section class="vein"><h2>Vos notes</h2><p class="sub">Combien de films à chaque note. Touchez une barre pour voir les films.</p><div class="hist">${hist}</div></section>
  <section class="vein"><h2>Vos coups de cœur</h2><p class="sub">Les derniers films que vous avez notés 5 sur 5.</p><div class="vgrid">${fav.slice(0,8).map(vc).join('')}</div>${fav.length>8?`<button type="button" class="more" data-n="5">Voir les ${fav.length} films notés 5 sur 5</button>`:''}</section>
  <section class="vein"><h2>Vos réalisateurs les plus sûrs</h2><p class="sub">Moyenne de vos notes, pour les réalisateurs dont vous avez vu au moins trois films.</p><div class="rows">${dirs.map(({p,a})=>row(`data-p="${esc(p.k)}"`,p.name,p.real.length,a)).join('')}</div></section>
