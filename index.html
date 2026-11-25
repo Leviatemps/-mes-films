@@ -48,7 +48,6 @@ input::placeholder{color:var(--mute)}
 @keyframes belt{to{transform:translateX(-50%)}}
 @media (prefers-reduced-motion:reduce){.belt{animation:none}.track{overflow-x:auto;scrollbar-width:none}}
 .chip{flex:none;position:relative;min-height:40px;padding:0 12px;margin-right:12px;border:0;border-radius:3px;background:transparent;color:var(--ivory);font:400 15px 'Josefin Sans',sans-serif;cursor:pointer;white-space:nowrap}
-.chip small{font:400 15px 'Poiret One',sans-serif;color:var(--gold2);margin-left:7px}
 .chip:hover{background:rgba(201,169,74,.1);color:var(--gold2)}
 .chip::after{content:"";position:absolute;right:-8px;top:50%;width:4px;height:4px;margin-top:-2px;transform:rotate(45deg);background:var(--gold);opacity:.7}
 .chiplbl{flex:none;font-size:14px;color:var(--gold);margin-right:6px}
@@ -404,7 +403,7 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  const avg=films.reduce((s,f)=>s+(+f.note||0),0)/films.length;
  $('stat').textContent=`${films.length} films notés · moyenne ${avg.toFixed(1).replace('.',',')}`;
  const all=films.map((f,i)=>i).reverse();
- const one=all.map(i=>`<button type="button" class="chip" data-i="${i}">${esc(films[i].titre)}<small>${esc(fmtN(films[i].note))}</small></button>`).join('');
+ const one=all.map(i=>`<button type="button" class="chip" data-i="${i}">${esc(films[i].titre)}</button>`).join('');
  $('chips').innerHTML=`<span class="chiplbl">Vos ${films.length} films</span><div class="track"><div class="belt">${one}<div aria-hidden="true" style="display:flex">${one.replace(/<button /g,'<button tabindex="-1" ')}</div></div></div>`;
  requestAnimationFrame(()=>{const b=document.querySelector('.belt');b.style.setProperty('--dur',(b.scrollWidth/2/45).toFixed(0)+'s')});
  $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
