@@ -98,6 +98,29 @@ dd{margin:2px 0 0}
 .vcard .vn span{font:400 28px/1 'Poiret One',sans-serif;color:var(--gold2)}
 .vcard .vn small{font-size:13px;color:var(--mute)}
 .medal{position:relative}
+.home .vein{margin-top:0}
+.home .vein+.vein{margin-top:56px}
+.hist{display:flex;align-items:flex-end;gap:clamp(6px,1.4vw,14px);height:190px;padding-top:24px}
+.hist button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;background:none;border:0;padding:0;cursor:pointer;color:var(--mute);font:inherit}
+.hist i{display:block;width:100%;max-width:46px;background:linear-gradient(180deg,var(--gold2),var(--gold));min-height:2px;transition:filter .15s}
+.hist button:hover i{filter:brightness(1.18)}
+.hist button:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
+.hist em{font-style:normal;font-size:13px;color:var(--ivory)}
+.hist span{font:400 20px/1 'Poiret One',sans-serif;color:var(--gold2);padding-top:6px;border-top:1px solid var(--line);width:100%;text-align:center}
+.rows{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 40px}
+.rows button{display:flex;justify-content:space-between;align-items:baseline;gap:12px;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 2px;color:var(--ivory);font:600 16px/1.3 'Josefin Sans',sans-serif;cursor:pointer;text-align:left}
+.rows button:hover b{color:var(--gold2)}
+.rows button:focus-visible{outline:2px solid var(--ivory);outline-offset:2px}
+.rows b{font-weight:600}
+.rows small{font-size:13px;color:var(--mute);font-weight:400;margin-left:8px}
+.rows span{font:400 24px/1 'Poiret One',sans-serif;color:var(--gold2);white-space:nowrap}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px 40px}
+.cols2 h3{font:700 15px/1 'Josefin Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 4px}
+.cols2 .rows{grid-template-columns:1fr}
+.more{margin-top:16px;background:none;border:0;color:var(--gold2);font:600 15px/1 'Josefin Sans',sans-serif;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--gold)}
+.more:hover{color:var(--ivory)}
+.brand{cursor:pointer}
+
 .empty{text-align:center;padding:60px 20px;max-width:560px;margin:0 auto}
 .empty h1{font-size:44px}
 .empty p{color:var(--mute)}
@@ -114,7 +137,7 @@ dd{margin:2px 0 0}
 <header>
  <div class="wrap">
   <div class="bar">
-   <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#c9a94a" stroke-width="1.4"><rect x="6" y="17" width="28" height="17"/><path d="M6 17l1-7 27-4 1 6z"/><path d="M12 9.2l3 6.8M19 8.2l3 6.8M26 7.2l3 6.8"/><path d="M6 23h28"/><path d="M10 28h10"/></svg><span>Mes fiches films</span></div>
+   <div class="brand" id="home" role="link" tabindex="0" title="Accueil"><svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#c9a94a" stroke-width="1.4"><rect x="6" y="17" width="28" height="17"/><path d="M6 17l1-7 27-4 1 6z"/><path d="M12 9.2l3 6.8M19 8.2l3 6.8M26 7.2l3 6.8"/><path d="M6 23h28"/><path d="M10 28h10"/></svg><span>Mes fiches films</span></div>
    <form id="f" autocomplete="off" role="search">
     <div class="pill">
      <label for="q"><input id="q" type="search" placeholder="Un film, une personne ou un thème" aria-label="Rechercher un film, un réalisateur, un acteur ou un thème" aria-autocomplete="list" aria-controls="sugg"></label>
@@ -301,6 +324,36 @@ function showPerson(p){
  <aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne de vos notes')}<p class="fine">Sur ${all.length} film${all.length>1?'s':''} de votre tableau.</p></div></aside></div>`;
  scrollTo({top:0,behavior:'smooth'});
 }
+function avgOf(l){return l.reduce((s,f)=>s+(+f.note||0),0)/l.length}
+const vc=f=>`<button type="button" class="vcard" data-t="${esc(f.titre)}"><b>${esc(f.titre)}</b><span class="who">${esc([f.real,f.annee].filter(Boolean).join(' · '))}</span><span class="vn"><span>${esc(fmtN(f.note))}</span><small>sur 5</small></span></button>`;
+function byNote(v){return films.filter(f=>+f.note===v)}
+function showNote(v){showList(`${fmtN(v)} sur 5`,'Note',plural(byNote(v).length),byNote(v),`Vos films notés ${fmtN(v)} sur 5`,'Du plus récent au plus ancien.')}
+function showHome(){
+ const avg=avgOf(films);
+ const steps=[1,1.5,2,2.5,3,3.5,4,4.5,5],cnt=steps.map(v=>byNote(v).length),mx=Math.max(...cnt);
+ const hist=steps.map((v,i)=>`<button type="button" data-n="${v}" aria-label="${cnt[i]} films notés ${fmtN(v)} sur 5"><em>${cnt[i]}</em><i style="height:${(cnt[i]/mx*100).toFixed(1)}%"></i><span>${fmtN(v)}</span></button>`).join('');
+ const fav=films.filter(f=>+f.note===5).reverse();
+ const dirs=people.filter(p=>p.real.length>=3).map(p=>({p,a:avgOf(p.real)})).sort((x,y)=>y.a-x.a||y.p.real.length-x.p.real.length).slice(0,8);
+ const gs=genres.filter(g=>g.films.length>=5).map(g=>({g,a:avgOf(g.films)})).sort((x,y)=>y.a-x.a);
+ const row=(attr,name,n,a)=>`<button type="button" ${attr}><b>${esc(name)}<small>${esc(plural(n))}</small></b><span>${esc(fmtN(a.toFixed(1)))}</span></button>`;
+ const grow=({g,a})=>row(`data-g="${esc(g.k)}"`,g.name,g.films.length,a);
+ $('out').innerHTML=`${marquee({titre:'Mes fiches films'},'',`${films.length} films notés · moyenne ${fmtN(avg.toFixed(1))} sur 5`)}<div class="grid home"><div>
+ <section class="vein"><h2>Vos notes</h2><p class="sub">Combien de films à chaque note. Touchez une barre pour voir les films.</p><div class="hist">${hist}</div></section>
+ <section class="vein"><h2>Vos coups de cœur</h2><p class="sub">Les derniers films que vous avez notés 5 sur 5.</p><div class="vgrid">${fav.slice(0,8).map(vc).join('')}</div>${fav.length>8?`<button type="button" class="more" data-n="5">Voir les ${fav.length} films notés 5 sur 5</button>`:''}</section>
+ <section class="vein"><h2>Vos réalisateurs les plus sûrs</h2><p class="sub">Moyenne de vos notes, pour les réalisateurs dont vous avez vu au moins trois films.</p><div class="rows">${dirs.map(({p,a})=>row(`data-p="${esc(p.k)}"`,p.name,p.real.length,a)).join('')}</div></section>
+ <section class="vein"><h2>Vos genres</h2><p class="sub">Moyenne de vos notes, pour les genres d'au moins cinq films.</p><div class="cols2"><div><h3>Vos préférés</h3><div class="rows">${gs.slice(0,5).map(grow).join('')}</div></div><div><h3>Vos moins aimés</h3><div class="rows">${gs.slice(-5).reverse().map(grow).join('')}</div></div></div></section>
+ </div><aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne générale')}<p class="fine">Sur les ${films.length} films de votre tableau.</p></div></aside></div>`;
+ $('q').value='';
+ scrollTo({top:0,behavior:'smooth'});
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-n],[data-p],[data-g]');if(!b||!$('out').contains(b))return;
+ if(b.dataset.n)showNote(+b.dataset.n);
+ else if(b.dataset.p){const p=people.find(x=>x.k===b.dataset.p);if(p){$('q').value=p.name;showPerson(p)}}
+ else{const g=genres.find(x=>x.k===b.dataset.g);if(g){$('q').value=g.name;showGenre(g)}}
+});
+$('home').addEventListener('click',showHome);
+$('home').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showHome()}});
 function search(q){
  q=q.trim();if(!q)return;hideSugg();$('q').blur();
  const hit=find(q);if(hit){showRated(hit.f);return}
@@ -348,7 +401,7 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  const last=films.slice(-8).reverse();
  $('chips').innerHTML='<span class="chiplbl">Derniers notés</span>'+last.map((f,i)=>`<button type="button" class="chip" data-i="${films.length-1-i}">${esc(f.titre)}</button>`).join('');
  $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
- showRated(films.find(f=>f.titre==='Gattaca')||films[0]);
+ showHome();
 }).catch(()=>{$('out').innerHTML='<div class="empty"><h1>Tableau indisponible</h1><p>La liste des films n\'a pas pu être chargée. Rechargez la page.</p></div>'});
 
 Promise.resolve(window.claude?.use?.('sample')).then(s=>{sample=s||null}).catch(()=>{sample=null});
