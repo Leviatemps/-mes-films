@@ -29,8 +29,9 @@ form{position:relative;width:100%}
 .pill label{display:flex;align-items:center;flex:1;padding:0 18px}
 input{border:0;outline:0;background:transparent;font:18px/1 'Josefin Sans',sans-serif;color:var(--ivory);padding:0;height:100%;width:100%}
 input::placeholder{color:var(--mute)}
-.go{min-height:0;padding:0 22px;border:0;background:var(--gold);color:var(--deep);font:700 15px 'Josefin Sans',sans-serif;cursor:pointer;flex:none}
-.go:hover{background:var(--gold2)}
+.go{width:52px;min-height:0;padding:0;border:0;border-left:1px solid var(--line);background:transparent;color:var(--gold);cursor:pointer;flex:none;display:grid;place-items:center}
+.go svg{width:20px;height:20px}
+.go:hover{color:var(--gold2);background:rgba(201,169,74,.08)}
 .go:focus-visible,.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
 .go:disabled{opacity:.6;cursor:wait}
 .sugg{position:absolute;left:0;right:0;top:calc(100% + 12px);background:var(--deep);border:1px solid var(--gold);list-style:none;margin:0;padding:6px;max-height:360px;overflow:auto;z-index:5;box-shadow:0 12px 30px rgba(0,0,0,.5)}
@@ -105,7 +106,7 @@ dd{margin:2px 0 0}
 @keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
 @media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}.bar{grid-template-columns:auto minmax(0,1fr)}.stat{display:none}}
-@media(max-width:560px){.brand span{display:none}.go{padding:0 12px}.disc{width:160px;height:160px}.disc b{font-size:54px}}
+@media(max-width:560px){.brand span{display:none}.disc{width:160px;height:160px}.disc b{font-size:54px}}
 </style>
 </head>
 <body>
@@ -116,7 +117,7 @@ dd{margin:2px 0 0}
    <form id="f" autocomplete="off" role="search">
     <div class="pill">
      <label for="q"><input id="q" type="search" placeholder="Un film, un réalisateur ou un acteur" aria-label="Rechercher un film, un réalisateur ou un acteur" aria-autocomplete="list" aria-controls="sugg"></label>
-     <button class="go" id="go" type="submit">Voir la fiche</button>
+     <button class="go" id="go" type="submit" aria-label="Voir la fiche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg></button>
     </div>
     <ul id="sugg" class="sugg" role="listbox" hidden></ul>
    </form>
