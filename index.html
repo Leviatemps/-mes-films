@@ -41,11 +41,16 @@ input::placeholder{color:var(--mute)}
 .sugg small{color:var(--gold);white-space:nowrap;font-size:14px}
 .sugg li.topic span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:9px;border:1.5px solid var(--gold);border-radius:50%;transform:translateY(-1px)}
 .sugg li.person span::before{content:"";display:inline-block;width:7px;height:7px;margin-right:9px;transform:rotate(45deg) translateY(-2px);background:var(--gold)}
-.chips{display:flex;gap:4px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none;align-items:center}
-.chip{flex:none;min-height:40px;padding:0 12px;border:0;border-radius:3px;background:transparent;color:var(--ivory);font:400 15px 'Josefin Sans',sans-serif;cursor:pointer}
+.chips{display:flex;gap:4px;padding:2px 0 16px;align-items:center}
+.track{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
+.belt{display:flex;width:max-content;animation:belt var(--dur,600s) linear infinite}
+.track:hover .belt,.track:focus-within .belt{animation-play-state:paused}
+@keyframes belt{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.belt{animation:none}.track{overflow-x:auto;scrollbar-width:none}}
+.chip{flex:none;position:relative;min-height:40px;padding:0 12px;margin-right:12px;border:0;border-radius:3px;background:transparent;color:var(--ivory);font:400 15px 'Josefin Sans',sans-serif;cursor:pointer;white-space:nowrap}
+.chip small{font:400 15px 'Poiret One',sans-serif;color:var(--gold2);margin-left:7px}
 .chip:hover{background:rgba(201,169,74,.1);color:var(--gold2)}
-.chip+.chip{position:relative;margin-left:10px}
-.chip+.chip::before{content:"";position:absolute;left:-9px;top:50%;width:4px;height:4px;margin-top:-2px;transform:rotate(45deg);background:var(--gold);opacity:.7}
+.chip::after{content:"";position:absolute;right:-8px;top:50%;width:4px;height:4px;margin-top:-2px;transform:rotate(45deg);background:var(--gold);opacity:.7}
 .chiplbl{flex:none;font-size:14px;color:var(--gold);margin-right:6px}
 main{padding:34px 0 70px}
 .marq{position:relative;margin:-34px calc(50% - 50vw) 0;border-bottom:1px solid var(--line);height:clamp(150px,18vw,210px);overflow:hidden;background:var(--panel)}
@@ -398,8 +403,10 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  films.forEach(f=>{const m=String(f.remarques||'').match(/Titre original\s*:\s*([^.;(]+)/i);if(m&&norm(m[1])!==norm(f.titre))idx.push({n:norm(m[1]),f})});
  const avg=films.reduce((s,f)=>s+(+f.note||0),0)/films.length;
  $('stat').textContent=`${films.length} films notés · moyenne ${avg.toFixed(1).replace('.',',')}`;
- const last=films.slice(-8).reverse();
- $('chips').innerHTML='<span class="chiplbl">Derniers notés</span>'+last.map((f,i)=>`<button type="button" class="chip" data-i="${films.length-1-i}">${esc(f.titre)}</button>`).join('');
+ const all=films.map((f,i)=>i).reverse();
+ const one=all.map(i=>`<button type="button" class="chip" data-i="${i}">${esc(films[i].titre)}<small>${esc(fmtN(films[i].note))}</small></button>`).join('');
+ $('chips').innerHTML=`<span class="chiplbl">Vos ${films.length} films</span><div class="track"><div class="belt">${one}<div aria-hidden="true" style="display:flex">${one.replace(/<button /g,'<button tabindex="-1" ')}</div></div></div>`;
+ requestAnimationFrame(()=>{const b=document.querySelector('.belt');b.style.setProperty('--dur',(b.scrollWidth/2/45).toFixed(0)+'s')});
  $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
  showHome();
 }).catch(()=>{$('out').innerHTML='<div class="empty"><h1>Tableau indisponible</h1><p>La liste des films n\'a pas pu être chargée. Rechargez la page.</p></div>'});
