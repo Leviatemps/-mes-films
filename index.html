@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mes fiches films</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poiret+One&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday, a 1920s picture palace programme
+   IDEA the printed programme of an Art deco cinema: gilt frames, sunburst over the screen, the verdict in a medallion
+   PICTURE a gilded sunburst marquee for each film with its title, and a rayed medallion holding the rating
+   COLOUR deep emerald ground, darker emerald panels, gold lines, ivory text; one palette in both themes
+   TYPE Poiret One only for the film title and rating figures, Josefin Sans 600-700 everywhere else
+   LAYOUT laptop: marquee search band, sunburst header, details left and sticky medallion right; phone: title, sunburst, medallion, details */
+:root{color-scheme:dark;--bg:#0b2f28;--deep:#072520;--panel:#0f3d33;--gold:#c9a94a;--gold2:#e6cf86;--ivory:#f6ecc9;--mute:#b9c9b4;--line:rgba(201,169,74,.35)}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Josefin Sans',system-ui,sans-serif;overflow-x:clip;min-height:100vh;background-image:repeating-linear-gradient(90deg,transparent 0 46px,rgba(201,169,74,.05) 46px 47px)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 max(4vw,16px)}
+header{background:var(--deep);border-bottom:1px solid var(--gold);box-shadow:0 4px 0 -1px var(--deep),0 5px 0 -1px var(--gold)}
+.bar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px;padding:18px 0 14px}
+.brand{display:flex;align-items:center;gap:10px;font:700 20px/1 'Josefin Sans',sans-serif;color:var(--gold2);white-space:nowrap}
+.brand svg{width:34px;height:34px}
+.stat{font-size:14px;color:var(--mute);white-space:nowrap}
+form{position:relative;max-width:560px;width:100%;justify-self:center}
+.pill{display:flex;align-items:center;gap:8px;border:1px solid var(--gold);background:var(--panel);padding:6px 6px 6px 18px}
+.pill:focus-within{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(230,207,134,.35)}
+.pill label{display:flex;flex-direction:column;flex:1}
+.pill small{font-size:13px;font-weight:600;color:var(--gold)}
+input{border:0;outline:0;background:transparent;font:17px 'Josefin Sans',sans-serif;color:var(--ivory);padding:2px 0;min-height:28px;width:100%}
+input::placeholder{color:var(--mute)}
+.go{min-height:46px;padding:0 18px;border:0;background:var(--gold);color:var(--deep);font:700 15px 'Josefin Sans',sans-serif;cursor:pointer;flex:none}
+.go:hover{background:var(--gold2)}
+.go:focus-visible,.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
+.go:disabled{opacity:.6;cursor:wait}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 12px);background:var(--deep);border:1px solid var(--gold);list-style:none;margin:0;padding:6px;max-height:360px;overflow:auto;z-index:5;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.sugg li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--line)}
+.sugg li:last-child{border-bottom:0}
+.sugg li[aria-selected=true],.sugg li:hover{background:var(--panel)}
+.sugg small{color:var(--gold);white-space:nowrap;font-size:14px}
+.chips{display:flex;gap:10px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none;align-items:center}
+.chip{flex:none;min-height:40px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--ivory);font:400 15px 'Josefin Sans',sans-serif;cursor:pointer}
+.chip:hover{border-color:var(--gold);color:var(--gold2)}
+.chiplbl{flex:none;font-size:14px;color:var(--gold)}
+main{padding:34px 0 70px}
+.marq{position:relative;border:1px solid var(--gold);height:clamp(184px,24vw,272px);overflow:hidden;background:var(--panel)}
+.marq svg{position:absolute;inset:0;width:100%;height:100%}
+.marq .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 20px clamp(16px,2.4vw,27px);text-align:center}
+.tag{font-size:13px;font-weight:600;color:var(--deep);background:var(--gold);padding:4px 12px;margin-top:12px}
+h1{font:400 clamp(32px,4.8vw,58px)/1.02 'Poiret One',sans-serif;margin:0;color:var(--ivory);text-wrap:balance;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+.meta{margin-top:8px;font-size:15px;color:var(--gold2)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:clamp(28px,5vw,64px);margin-top:44px;align-items:start}
+.sec{padding:26px 0;border-bottom:1px solid var(--line)}
+.sec:first-child{padding-top:0}
+.sec h2{font:700 25px/1.15 'Josefin Sans',sans-serif;color:var(--gold2);margin:0 0 14px;display:flex;align-items:center;gap:14px}
+.sec h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.lead{font-size:20px;font-weight:600;margin:0;color:var(--ivory)}
+.lead+p{margin:6px 0 0;color:var(--mute)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(13em,1fr));gap:0 28px;margin:0}
+.facts div{padding:12px 0;border-top:1px solid var(--line)}
+dt{font-size:14px;font-weight:600;color:var(--gold)}
+dd{margin:2px 0 0}
+.num{white-space:nowrap;font-variant-numeric:tabular-nums}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags span{border:1px solid var(--line);padding:6px 12px;font-size:15px}
+.syn{font-size:18px;margin:0;max-width:66ch}
+.note{font-size:15px;color:var(--mute);margin:0}
+.side{position:sticky;top:24px}
+.medal{background:var(--deep);border:1px solid var(--gold);padding:26px 22px;text-align:center}
+.medal .lbl{font-size:15px;font-weight:600;color:var(--gold);margin:0}
+.disc{position:relative;width:190px;height:190px;margin:10px auto 6px}
+.disc svg{position:absolute;inset:0;width:100%;height:100%}
+.disc b{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font:400 64px/1 'Poiret One',sans-serif;color:var(--ivory)}
+.disc small{font:600 14px 'Josefin Sans',sans-serif;color:var(--gold);margin-top:2px}
+.stars{display:flex;gap:5px;justify-content:center;margin:6px 0 14px}
+.stars svg{width:22px;height:22px}
+.why{border-top:1px solid var(--line);padding-top:14px;font-size:16px;margin:0 0 6px;text-align:left}
+.fine{font-size:14px;color:var(--mute);margin:10px 0 0}
+.btn{min-height:50px;padding:0 24px;border:0;background:var(--gold);color:var(--deep);font:700 16px 'Josefin Sans',sans-serif;cursor:pointer;margin-top:14px}
+.btn:hover{background:var(--gold2)}
+.vein{margin-top:48px}
+.vein h2{font:700 25px/1.15 'Josefin Sans',sans-serif;color:var(--gold2);margin:0 0 6px;display:flex;align-items:center;gap:14px}
+.vein h2::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.vein .sub{color:var(--mute);font-size:15px;margin:0 0 16px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.vcard{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ivory);padding:16px 16px 14px;cursor:pointer;font:inherit;min-height:44px;transition:border-color .2s}
+.vcard:hover{border-color:var(--gold)}
+.vcard:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
+.vcard b{font:700 19px/1.2 'Josefin Sans',sans-serif;color:var(--ivory)}
+.vcard .who{font-size:14px;color:var(--mute)}
+.vcard .why2{font-size:13px;color:var(--gold)}
+.vcard .vn{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.vcard .vn span{font:400 28px/1 'Poiret One',sans-serif;color:var(--gold2)}
+.vcard .vn small{font-size:13px;color:var(--mute)}
+.marq::after,.medal::after{content:"";position:absolute;inset:8px;pointer-events:none;z-index:2;opacity:.45;background-size:22px 22px!important;background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='38' height='38' viewBox='0 0 36 36' fill='none' stroke='%23c9a94a' stroke-width='1.3'><path d='M2 34V2h32'/><path d='M7 34V7h27'/><path d='M7 20a13 13 0 0 1 13-13'/><path d='M7 14a7 7 0 0 1 7-7'/><path d='M12 12l6 6'/><rect x='0.5' y='0.5' width='4' height='4' fill='%23c9a94a' stroke='none'/></svg>") top left no-repeat,url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='38' height='38' viewBox='0 0 36 36' fill='none' stroke='%23c9a94a' stroke-width='1.3'><g transform='scale(-1 1) translate(-36 0)'><path d='M2 34V2h32'/><path d='M7 34V7h27'/><path d='M7 20a13 13 0 0 1 13-13'/><path d='M7 14a7 7 0 0 1 7-7'/><path d='M12 12l6 6'/><rect x='0.5' y='0.5' width='4' height='4' fill='%23c9a94a' stroke='none'/></g></svg>") top right no-repeat,url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='38' height='38' viewBox='0 0 36 36' fill='none' stroke='%23c9a94a' stroke-width='1.3'><g transform='scale(1 -1) translate(0 -36)'><path d='M2 34V2h32'/><path d='M7 34V7h27'/><path d='M7 20a13 13 0 0 1 13-13'/><path d='M7 14a7 7 0 0 1 7-7'/><path d='M12 12l6 6'/><rect x='0.5' y='0.5' width='4' height='4' fill='%23c9a94a' stroke='none'/></g></svg>") bottom left no-repeat,url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='38' height='38' viewBox='0 0 36 36' fill='none' stroke='%23c9a94a' stroke-width='1.3'><g transform='scale(-1 -1) translate(-36 -36)'><path d='M2 34V2h32'/><path d='M7 34V7h27'/><path d='M7 20a13 13 0 0 1 13-13'/><path d='M7 14a7 7 0 0 1 7-7'/><path d='M12 12l6 6'/><rect x='0.5' y='0.5' width='4' height='4' fill='%23c9a94a' stroke='none'/></g></svg>") bottom right no-repeat}
+.medal{position:relative}
+@media(max-width:560px){.marq::after,.medal::after{inset:6px;background-size:18px 18px!important}}
+.empty{text-align:center;padding:60px 20px;max-width:560px;margin:0 auto;border:1px solid var(--gold)}
+.empty h1{font-size:44px}
+.empty p{color:var(--mute)}
+.load{display:flex;flex-direction:column;align-items:center;gap:18px;padding:80px 20px;color:var(--gold2)}
+.dots{display:flex;gap:10px}.dots i{width:12px;height:12px;transform:rotate(45deg);background:var(--gold);animation:b 1.1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}.bar{grid-template-columns:auto minmax(0,1fr)}.stat{display:none}}
+@media(max-width:560px){.brand span{display:none}.go{padding:0 12px}.disc{width:160px;height:160px}.disc b{font-size:54px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+  <div class="bar">
+   <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="#c9a94a" stroke-width="1.4"><path d="M4 34h32"/><path d="M8 34a12 12 0 0 1 24 0"/><path d="M12.5 34a7.5 7.5 0 0 1 15 0"/><path d="M20 34V8M20 34L9 13M20 34l11-21M20 34L5 22M20 34l15-12"/></svg><span>Mes fiches films</span></div>
+   <form id="f" autocomplete="off" role="search">
+    <div class="pill">
+     <label for="q"><small>Film</small><input id="q" type="search" placeholder="Rechercher un titre" aria-autocomplete="list" aria-controls="sugg"></label>
+     <button class="go" id="go" type="submit">Voir la fiche</button>
+    </div>
+    <ul id="sugg" class="sugg" role="listbox" hidden></ul>
+   </form>
+   <div class="stat" id="stat"></div>
+  </div>
+  <div class="chips" id="chips"></div>
+ </div>
+</header>
+<main><div class="wrap" id="out"></div></main>
+<script>
+{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/œ/g,'oe').replace(/[^a-z0-9]+/g,' ').replace(/\b(le|la|les|l|the|un|une|a)\b/g,' ').replace(/\s+/g,' ').trim();
+const K=['titre','note','genre','real','acteurs','annee','duree','pays','budget','recettes','imdb','themes','remarques','synopsis'];
+let films=[],idx=[],sample=null,busy=false;
+const money=v=>v==null||v===''?'Non renseigné':'$'+Math.round(v).toLocaleString('fr-FR');
+const dur=v=>{if(!v)return 'Non renseignée';const h=Math.floor(v/60),m=v%60;return h?`${h} h ${String(m).padStart(2,'0')}`:`${m} min`};
+const txt=v=>v==null||v===''?'Non renseigné':v;
+const fmtN=n=>String(n).replace('.',',');
+const STAR='M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6L2.5 9.4l6.6-.8z';
+let sid=0;
+const star=f=>{const id='s'+(sid++);return `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="${id}"><stop offset="${f*100}%" stop-color="#e6cf86"/><stop offset="${f*100}%" stop-color="rgba(201,169,74,.25)"/></linearGradient></defs><path fill="url(#${id})" d="${STAR}"/></svg>`};
+const stars=n=>'<div class="stars" aria-label="'+fmtN(n)+' sur 5">'+[1,2,3,4,5].map(i=>star(Math.max(0,Math.min(1,n-i+1)))).join('')+'</div>';
+
+function marquee(f,tag,meta){
+ const rays=Array.from({length:23},(_,i)=>{const a=Math.PI*(i+1)/24;return `<line x1="50%" y1="100%" x2="${(50-Math.cos(a)*120).toFixed(2)}%" y2="${(100-Math.sin(a)*200).toFixed(2)}%" stroke="#c9a94a" stroke-opacity="${i%2?.22:.45}" stroke-width="${i%2?1:1.6}"/>`}).join('');
+ const arcs=[30,46,62].map((r,i)=>`<ellipse cx="50%" cy="100%" rx="${r}%" ry="${r*1.7}%" fill="none" stroke="#c9a94a" stroke-opacity="${.5-i*.12}" stroke-width="1.2"/>`).join('');
+ return `<div class="marq"><svg aria-hidden="true" preserveAspectRatio="none"><defs><radialGradient id="glow" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#1c5a4b"/><stop offset="1" stop-color="#0f3d33"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#glow)"/>${rays}${arcs}</svg><div class="in"><h1>${esc(f.titre)}</h1><div class="meta">${esc(meta)}</div><span class="tag">${esc(tag)}</span></div></div>`;
+}
+function disc(n,lbl){
+ const r=Array.from({length:36},(_,i)=>{const a=i*Math.PI/18,c=Math.cos(a),s=Math.sin(a),r1=i%2?84:80;return `<line x1="${(100+c*62).toFixed(1)}" y1="${(100+s*62).toFixed(1)}" x2="${(100+c*r1).toFixed(1)}" y2="${(100+s*r1).toFixed(1)}" stroke="#c9a94a" stroke-width="${i%2?1:2}"/>`}).join('');
+ return `<p class="lbl">${lbl}</p><div class="disc"><svg viewBox="0 0 200 200" aria-hidden="true">${r}<circle cx="100" cy="100" r="58" fill="#0f3d33" stroke="#c9a94a" stroke-width="1.5"/><circle cx="100" cy="100" r="52" fill="none" stroke="#c9a94a" stroke-opacity=".5"/><circle cx="100" cy="100" r="92" fill="none" stroke="#c9a94a" stroke-opacity=".6"/></svg><b>${esc(fmtN(n))}<small>sur 5</small></b></div>${stars(n)}`;
+}
+function find(q){const n=norm(q);if(!n)return null;return idx.find(x=>x.n===n)||null}
+function matches(q){const n=norm(q);if(!n)return [];const out=idx.filter(x=>x.n.includes(n));out.sort((a,b)=>(a.n.startsWith(n)?0:1)-(b.n.startsWith(n)?0:1)||a.n.length-b.n.length);return out.filter((x,i)=>out.findIndex(y=>y.f===x.f)===i).slice(0,7)}
+
+function body(f,extra){
+ const facts=[['Réalisateur',txt(f.real)],['Année',txt(f.annee),1],['Durée',dur(f.duree),1],['Pays',txt(f.pays)],['Note IMDb',f.imdb==null||f.imdb===''?'Non renseignée':fmtN(f.imdb)+' / 10',1],['Budget',money(f.budget),1],['Recettes mondiales',money(f.recettes),1]];
+ const themes=String(f.themes||'').split(',').map(x=>x.trim()).filter(Boolean);
+ return `<div class="sec"><p class="lead">${esc(txt(f.genre))}</p><p>${esc(txt(f.acteurs))}</p></div>
+ ${extra||''}
+ <div class="sec"><h2>Le film</h2><dl class="facts">${facts.map(([l,v,num])=>`<div><dt>${l}</dt><dd${num?' class="num"':''}>${esc(v)}</dd></div>`).join('')}</dl></div>
+ ${themes.length?`<div class="sec"><h2>Thèmes</h2><div class="tags">${themes.map(t=>`<span>${esc(t)}</span>`).join('')}</div></div>`:''}`;
+}
+const STOP=new Set(['avec','dans','pour','sans','entre','contre','apres','avant','sous','leur','leurs','plus','tres','qui','que','une','des','les','aux','sur','par','son','ses','sa','est','fait','film','histoire','vraie','deux','trois','jeune','homme','femme','annees','ans','vie','partir','tout']);
+const words=t=>new Set(norm(t).split(' ').filter(w=>w.length>3&&!STOP.has(w)));
+const list=t=>String(t||'').split(',').map(x=>norm(x)).filter(Boolean);
+function similar(f){
+ const real=list(f.real),act=list(f.acteurs),gen=list(f.genre),th=words(f.themes);
+ const out=[];
+ for(const g of films){
+  if(norm(g.titre)===norm(f.titre))continue;
+  let sc=0,why='';
+  const r2=list(g.real);
+  if(real.length&&r2.some(x=>real.includes(x))){sc+=6;why='Même réalisateur'}
+  const ca=list(g.acteurs).filter(x=>act.includes(x));
+  if(ca.length){sc+=1.5*ca.length;if(!why)why='Avec '+String(g.acteurs).split(',').map(x=>x.trim()).find(x=>act.includes(norm(x)))}
+  const cg=list(g.genre).filter(x=>gen.includes(x)).length;sc+=cg;
+  let ct=0;for(const w of words(g.themes))if(th.has(w))ct++;
+  sc+=ct*0.8;if(!why&&ct>=2)why='Thèmes proches';if(!why&&cg)why='Même genre';
+  if(sc>=2)out.push({g,sc,why});
+ }
+ out.sort((a,b)=>b.sc-a.sc||b.g.note-a.g.note);
+ return out.slice(0,4);
+}
+function vein(f){
+ const s=similar(f);if(!s.length)return '';
+ return `<section class="vein"><h2>Dans la même veine</h2><p class="sub">Des films de votre tableau qui partagent un réalisateur, des acteurs ou des thèmes.</p><div class="vgrid">${s.map(({g,why})=>`<button type="button" class="vcard" data-t="${esc(g.titre)}"><b>${esc(g.titre)}</b><span class="who">${esc([g.real,g.annee].filter(Boolean).join(' · '))}</span><span class="why2">${esc(why)}</span><span class="vn"><span>${esc(fmtN(g.note))}</span><small>sur 5</small></span></button>`).join('')}</div></section>`;
+}
+document.addEventListener('click',e=>{const c=e.target.closest('.vcard');if(!c)return;const g=films.find(x=>x.titre===c.dataset.t);if(g){$('q').value=g.titre;showRated(g)}});
+function showRated(f){
+ $('out').innerHTML=`${marquee(f,'Déjà visionné',[f.real,f.annee,f.pays].filter(Boolean).join(' · '))}<div class="grid"><div>${body(f,f.synopsis?`<div class="sec"><h2>Synopsis</h2><p class="syn">${esc(f.synopsis)}</p></div>`:'')}${f.remarques?`<div class="sec"><p class="note">${esc(f.remarques)}</p></div>`:''}</div>
+ <aside class="side"><div class="medal">${disc(+f.note,'Ma note')}<p class="fine">Note issue de votre tableau.</p></div></aside></div>${vein(f)}`;
+ scrollTo({top:0,behavior:'smooth'});
+}
+function showNew(r){
+ const f={titre:r.titre,genre:r.genre,real:r.realisateur,acteurs:r.acteurs,annee:r.annee,duree:r.duree_min,pays:r.pays,budget:r.budget_usd,recettes:r.recettes_usd,imdb:r.imdb,themes:r.themes};
+ const p=Math.round((+r.prediction||0)*2)/2;
+ const syn=`<div class="sec"><h2>Synopsis</h2><p class="syn">${esc(r.synopsis||'')}</p></div>`;
+ const meta=[r.titre_original&&r.titre_original!==r.titre?r.titre_original:'',f.real,f.annee].filter(Boolean).join(' · ');
+ $('out').innerHTML=`${marquee(f,'Pas encore noté',meta)}<div class="grid"><div>${body(f,syn)}<div class="sec"><p class="note">Fiche préparée par Claude à partir de ses connaissances, sans accès direct à IMDb. ${esc(r.incertain||'')}</p></div></div>
+ <aside class="side"><div class="medal">${disc(p,'Note prédite pour vous')}<p class="why">${esc(r.raison||'')}</p><p class="fine">Envoyez-moi votre vraie note dans la conversation pour l'ajouter au tableau.</p></div></aside></div>${vein(f)}`;
+}
+function showEmpty(q,msg){
+ $('out').innerHTML=`<div class="empty"><h1>${esc(q)}</h1><p>${esc(msg)}</p>${sample?'<button id="ask" class="btn" type="button">Préparer la fiche avec Claude</button>':'<p>La recherche par Claude n\'est pas disponible sur cette vue.</p>'}</div>`;
+ const b=$('ask');if(b)b.onclick=()=>ask(q);
+}
+
+const PROFIL=`Profil de goûts (notes de 1 à 5) :
+- Aime : l'injustice et le combat contre elle ; les procès (genre le plus fiable) ; les dilemmes moraux et la culpabilité ; le héros coupable ou imposteur qui risque d'être démasqué ; le héros protecteur quand le film construit un vrai lien affectif et un enjeu personnel ; l'individu contre un système ; l'ambition qui coûte au héros (ascension puis prix à payer) ; la compromission morale de gens ordinaires sous un régime oppressif ; les twists inattendus qui transforment un personnage ; les biopics d'un homme brillant mais abîmé ; les westerns sombres de vengeance ; les comédies de situation avec un mécanisme qui s'emballe et des personnages crédibles ; les comédies nostalgiques d'enfance ; un parent qui se bat contre le système pour son enfant.
+- Les films lents passent s'ils sont portés par un mystère ou une menace, ou s'ils sont sereins et chaleureux. Les films de festival passent s'ils collent à un personnage qui se débat. Le fantastique passe s'il cache une enquête.
+- N'aime pas : la SF spatiale et la fantasy à grand spectacle ; la survie solitaire ; le style au détriment de l'émotion ; les films contemplatifs lourds ; les héros passifs ; les suites (toujours moins bien que l'original, sauf récit unique découpé en deux) ; les chroniques sans conflit (plafond 3) ; les films choraux (plafond 3,5) ; le noir froid de festival ; les films de guerre centrés sur le combat ; les codes du film de super-héros ; les comédies de gags, parodies et caricatures (plafond 3) ; l'ironie qui tient le héros à distance ; les concepts malins sans profondeur humaine ; les twists prévisibles.
+- Réalisateurs très sûrs : Clint Eastwood (moyenne 4,8), Olivier Marchal, Haneke, Audiard, Luc Besson, Antonin Baudry, Giannoli. Réalisateurs faibles : Spielberg, Malick, Wes Anderson, Zack Snyder, Ari Aster. Les acteurs et la note IMDb ne prédisent pas ses notes.`;
+
+async function ask(q){
+ if(busy||!sample)return;busy=true;$('go').disabled=true;
+ $('out').innerHTML=`<div class="load"><div class="dots"><i></i><i></i><i></i></div>Claude prépare la fiche de « ${esc(q)} »…</div>`;
+ const liste=films.map(f=>`${f.titre} (${f.annee??'?'}) : ${f.note}`).join('\n');
+ const prompt=`Tu prépares la fiche d'un film pour un cinéphile francophone, et tu prédis la note qu'il lui mettrait.
+Film demandé : « ${q} »
+
+${PROFIL}
+
+Ses ${films.length} films notés :
+${liste}
+
+Réponds uniquement avec un objet JSON, sans texte autour, avec ces clés :
+{"trouve":true ou false,"deja_note":titre exact de la liste si le film demandé y figure déjà sous un autre nom, sinon null,"titre":titre français usuel,"titre_original":titre original,"genre":"genres séparés par des virgules","realisateur":"","acteurs":"4 à 6 acteurs principaux séparés par des virgules","annee":nombre,"duree_min":nombre,"pays":"pays de production","budget_usd":nombre ou null,"recettes_usd":recettes mondiales en dollars, nombre ou null,"imdb":note IMDb sur 10 ou null,"themes":"5 à 8 thèmes courts séparés par des virgules","synopsis":"synopsis de 3 à 4 phrases, sans révéler la fin","prediction":note prédite de 1 à 5 par pas de 0,5,"raison":"une phrase qui justifie la prédiction en citant une règle du profil et un film de sa liste","incertain":"une courte phrase si des chiffres sont incertains ou si le titre est ambigu (précise quelle version tu as choisie), sinon chaîne vide","suggestions":["si trouve vaut false, jusqu'à 3 titres proches"]}
+Si tu n'es pas sûr d'un chiffre, mets null plutôt que d'inventer. Tout le texte est en français.`;
+ try{
+  const res=await sample(prompt,{modelTier:'default'});
+  const m=String(res.text||'').match(/\{[\s\S]*\}/);
+  const r=JSON.parse(m?m[0]:res.text);
+  const known=r.deja_note&&find(r.deja_note);
+  if(known){showRated(known.f);$('q').value=known.f.titre}
+  else if(!r.trouve){showEmpty(q,'Claude ne reconnaît pas ce film.'+(r.suggestions&&r.suggestions.length?' Vouliez-vous dire : '+r.suggestions.join(', ')+' ?':''))}
+  else showNew(r);
+ }catch(e){
+  const msg=e&&e.code==='not_granted'?'Vous n\'avez pas autorisé cette page à interroger Claude.':e&&e.code==='rate_limited'?'Trop de demandes pour le moment. Réessayez dans un instant.':'La fiche n\'a pas pu être préparée. Réessayez.';
+  $('out').innerHTML=`<div class="empty"><h1>${esc(q)}</h1><p>${esc(msg)}</p><button id="ask" class="btn" type="button">Réessayer</button></div>`;
+  $('ask').onclick=()=>ask(q);
+ }finally{busy=false;$('go').disabled=false}
+}
+
+
+function search(q){
+ q=q.trim();if(!q)return;hideSugg();$('q').blur();
+ const hit=find(q);if(hit){showRated(hit.f);return}
+ const m=matches(q);if(m.length===1){showRated(m[0].f);$('q').value=m[0].f.titre;return}
+ if(sample)ask(q);else showEmpty(q,'Ce film n\'est pas dans votre tableau.');
+}
+let sel=-1,cur=[];
+function hideSugg(){$('sugg').hidden=true;sel=-1}
+function renderSugg(){
+ const q=$('q').value;cur=matches(q);
+ if(!cur.length||!q.trim()){hideSugg();return}
+ $('sugg').innerHTML=cur.map((x,i)=>`<li role="option" aria-selected="${i===sel}" data-i="${i}"><span>${esc(x.f.titre)}</span><small>${esc(x.f.annee??'')} · ${esc(fmtN(x.f.note))}/5</small></li>`).join('');
+ $('sugg').hidden=false;
+}
+const pick=f=>{$('q').value=f.titre;hideSugg();showRated(f)};
+$('q').addEventListener('input',()=>{sel=-1;renderSugg()});
+$('q').addEventListener('keydown',e=>{
+ if($('sugg').hidden)return;
+ if(e.key==='ArrowDown'){sel=Math.min(cur.length-1,sel+1);renderSugg();e.preventDefault()}
+ else if(e.key==='ArrowUp'){sel=Math.max(-1,sel-1);renderSugg();e.preventDefault()}
+ else if(e.key==='Enter'&&sel>=0){e.preventDefault();pick(cur[sel].f)}
+ else if(e.key==='Escape')hideSugg();
+});
+$('sugg').addEventListener('mousedown',e=>{const li=e.target.closest('li');if(!li)return;e.preventDefault();pick(cur[+li.dataset.i].f)});
+$('q').addEventListener('blur',()=>setTimeout(hideSugg,100));
+$('f').addEventListener('submit',e=>{e.preventDefault();search($('q').value)});
+
+fetch('films.json').then(r=>r.json()).then(d=>{
+ films=d.map(r=>Object.fromEntries(K.map((k,i)=>[k,r[i]])));
+ idx=films.map(f=>({n:norm(f.titre),f}));
+ films.forEach(f=>{const m=String(f.remarques||'').match(/Titre original\s*:\s*([^.;(]+)/i);if(m&&norm(m[1])!==norm(f.titre))idx.push({n:norm(m[1]),f})});
+ const avg=films.reduce((s,f)=>s+(+f.note||0),0)/films.length;
+ $('stat').textContent=`${films.length} films notés · moyenne ${avg.toFixed(1).replace('.',',')}`;
+ const last=films.slice(-8).reverse();
+ $('chips').innerHTML='<span class="chiplbl">Derniers notés</span>'+last.map((f,i)=>`<button type="button" class="chip" data-i="${films.length-1-i}">${esc(f.titre)}</button>`).join('');
+ $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
+ showRated(films.find(f=>f.titre==='Gattaca')||films[0]);
+}).catch(()=>{$('out').innerHTML='<div class="empty"><h1>Tableau indisponible</h1><p>La liste des films n\'a pas pu être chargée. Rechargez la page.</p></div>'});
+
+Promise.resolve(window.claude?.use?.('sample')).then(s=>{sample=s||null}).catch(()=>{sample=null});
+}
+</script>
+</body>
+</html>
