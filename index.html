@@ -23,14 +23,15 @@ header{background:var(--deep);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;font:700 20px/1 'Josefin Sans',sans-serif;color:var(--gold2);white-space:nowrap}
 .brand svg{width:34px;height:34px}
 form{position:relative;width:100%}
-.pill{display:flex;align-items:stretch;border:1px solid var(--gold);background:var(--panel);height:52px}
-.pill:focus-within{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(230,207,134,.35)}
+.pill{display:flex;align-items:stretch;border:1px solid rgba(201,169,74,.2);background:rgba(246,236,201,.035);height:52px;transition:border-color .2s,background .2s}
+.pill:hover{border-color:rgba(201,169,74,.38)}
+.pill:focus-within{border-color:rgba(230,207,134,.7);background:rgba(246,236,201,.06)}
 .pill label{display:flex;align-items:center;flex:1;padding:0 18px}
 input{border:0;outline:0;background:transparent;font:18px/1 'Josefin Sans',sans-serif;color:var(--ivory);padding:0;height:100%;width:100%}
 input::placeholder{color:var(--mute)}
-.go{width:52px;min-height:0;padding:0;border:0;border-left:1px solid var(--line);background:transparent;color:var(--gold);cursor:pointer;flex:none;display:grid;place-items:center}
+.go{width:52px;min-height:0;padding:0;border:0;background:transparent;color:var(--gold);cursor:pointer;flex:none;display:grid;place-items:center}
 .go svg{width:20px;height:20px}
-.go:hover{color:var(--gold2);background:rgba(201,169,74,.08)}
+.go:hover{color:var(--gold2)}
 .go:focus-visible,.chip:focus-visible,.btn:focus-visible{outline:2px solid var(--ivory);outline-offset:3px}
 .go:disabled{opacity:.6;cursor:wait}
 .sugg{position:absolute;left:0;right:0;top:calc(100% + 12px);background:var(--deep);border:1px solid var(--gold);list-style:none;margin:0;padding:6px;max-height:360px;overflow:auto;z-index:5;box-shadow:0 12px 30px rgba(0,0,0,.5)}
@@ -134,7 +135,7 @@ dd{margin:2px 0 0}
 @keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.dots i{animation:none;opacity:.7}}
 @media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1}}
-@media(max-width:560px){.brand span{display:none}.disc{width:160px;height:160px}.disc b{font-size:54px}}
+@media(max-width:560px){input{font-size:16px}.pill label{padding:0 14px}.brand span{display:none}.disc{width:160px;height:160px}.disc b{font-size:54px}}
 </style>
 </head>
 <body>
