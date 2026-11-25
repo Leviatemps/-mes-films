@@ -146,7 +146,7 @@ const stars=n=>'<div class="stars" aria-label="'+fmtN(n)+' sur 5">'+[1,2,3,4,5].
 function marquee(f,tag,meta){
  const rays=Array.from({length:23},(_,i)=>{const a=Math.PI*(i+1)/24;return `<line x1="50%" y1="100%" x2="${(50-Math.cos(a)*120).toFixed(2)}%" y2="${(100-Math.sin(a)*200).toFixed(2)}%" stroke="#c9a94a" stroke-opacity="${i%2?.22:.45}" stroke-width="${i%2?1:1.6}"/>`}).join('');
  const arcs=[30,46,62].map((r,i)=>`<ellipse cx="50%" cy="100%" rx="${r}%" ry="${r*1.7}%" fill="none" stroke="#c9a94a" stroke-opacity="${.5-i*.12}" stroke-width="1.2"/>`).join('');
- return `<div class="marq"><svg aria-hidden="true" preserveAspectRatio="none"><defs><radialGradient id="glow" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#1c5a4b"/><stop offset="1" stop-color="#0f3d33"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#glow)"/>${rays}${arcs}</svg><div class="in"><h1>${esc(f.titre)}</h1><div class="meta">${esc(meta)}</div><span class="tag">${esc(tag)}</span></div></div>`;
+ return `<div class="marq"><svg aria-hidden="true" preserveAspectRatio="none"><defs><radialGradient id="glow" cx="50%" cy="100%" r="70%"><stop offset="0" stop-color="#1c5a4b"/><stop offset="1" stop-color="#0f3d33"/></radialGradient></defs><rect width="100%" height="100%" fill="url(#glow)"/>${rays}${arcs}</svg><div class="in"><h1>${esc(f.titre)}</h1><div class="meta">${esc(meta)}</div>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div></div>`;
 }
 function disc(n,lbl){
  const r=Array.from({length:36},(_,i)=>{const a=i*Math.PI/18,c=Math.cos(a),s=Math.sin(a),r1=i%2?84:80;return `<line x1="${(100+c*62).toFixed(1)}" y1="${(100+s*62).toFixed(1)}" x2="${(100+c*r1).toFixed(1)}" y2="${(100+s*r1).toFixed(1)}" stroke="#c9a94a" stroke-width="${i%2?1:2}"/>`}).join('');
@@ -190,7 +190,7 @@ function vein(f){
 }
 document.addEventListener('click',e=>{const c=e.target.closest('.vcard');if(!c)return;const g=films.find(x=>x.titre===c.dataset.t);if(g){$('q').value=g.titre;showRated(g)}});
 function showRated(f){
- $('out').innerHTML=`${marquee(f,'Déjà visionné',[f.real,f.annee,f.pays].filter(Boolean).join(' · '))}<div class="grid"><div>${body(f,f.synopsis?`<div class="sec"><h2>Synopsis</h2><p class="syn">${esc(f.synopsis)}</p></div>`:'')}${f.remarques?`<div class="sec"><p class="note">${esc(f.remarques)}</p></div>`:''}</div>
+ $('out').innerHTML=`${marquee(f,'',[f.real,f.annee,f.pays].filter(Boolean).join(' · '))}<div class="grid"><div>${body(f,f.synopsis?`<div class="sec"><h2>Synopsis</h2><p class="syn">${esc(f.synopsis)}</p></div>`:'')}${f.remarques?`<div class="sec"><p class="note">${esc(f.remarques)}</p></div>`:''}</div>
  <aside class="side"><div class="medal">${disc(+f.note,'Ma note')}<p class="fine">Note issue de votre tableau.</p></div></aside></div>${vein(f)}`;
  scrollTo({top:0,behavior:'smooth'});
 }
