@@ -125,6 +125,13 @@ dd{margin:2px 0 0}
 .more{margin-top:16px;background:none;border:0;color:var(--gold2);font:600 15px/1 'Josefin Sans',sans-serif;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--gold)}
 .more:hover{color:var(--ivory)}
 .brand{cursor:pointer}
+.home .side{position:static}
+.avside{margin-top:36px;padding-top:26px;border-top:1px solid var(--line)}
+.avside h3{font:700 22px/1.15 'Josefin Sans',sans-serif;color:var(--gold2);margin:0 0 4px}
+.avside .sub{color:var(--mute);font-size:14px;margin:0 0 6px}
+.avside .rows{grid-template-columns:1fr}
+.avside .rows button{font-size:15px;padding:9px 2px}
+.avside .rows span{font-size:21px}
 
 .empty{text-align:center;padding:60px 20px;max-width:560px;margin:0 auto}
 .empty h1{font-size:44px}
@@ -357,10 +364,9 @@ function showHome(){
  $('out').innerHTML=`${marquee({titre:'Le 7ème art'},'',`${films.length} films notés`)}<div class="grid home"><div>
  <section class="vein"><h2>Vos notes</h2><p class="sub">Combien de films à chaque note. Touchez une barre pour voir les films.</p><div class="hist">${hist}</div></section>
  <section class="vein"><h2>Vos coups de cœur</h2><p class="sub">Les derniers films que vous avez notés 5 sur 5.</p><div class="vgrid">${fav.slice(0,8).map(vc).join('')}</div>${fav.length>8?`<button type="button" class="more" data-n="5">Voir les ${fav.length} films notés 5 sur 5</button>`:''}</section>
- ${avoir.length?`<section class="vein"><h2>À voir</h2><p class="sub">Des films que vous n'avez pas notés et qui devraient vous plaire, avec ma note prédite.</p><div class="vgrid">${avoir.slice(0,8).map(ac).join('')}</div>${avoir.length>8?`<button type="button" class="more" data-av="1">Voir les ${avoir.length} films à voir</button>`:''}</section>`:''}
  <section class="vein"><h2>Vos réalisateurs les plus sûrs</h2><p class="sub">Moyenne de vos notes, pour les réalisateurs dont vous avez vu au moins trois films.</p><div class="rows">${dirs.map(({p,a})=>row(`data-p="${esc(p.k)}"`,p.name,p.real.length,a)).join('')}</div></section>
  <section class="vein"><h2>Vos genres</h2><p class="sub">Moyenne de vos notes, pour les genres d'au moins cinq films.</p><div class="cols2"><div><h3>Vos préférés</h3><div class="rows">${gs.slice(0,5).map(grow).join('')}</div></div><div><h3>Vos moins aimés</h3><div class="rows">${gs.slice(-5).reverse().map(grow).join('')}</div></div></div></section>
- </div><aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne générale')}<p class="fine">Sur les ${films.length} films de votre tableau.</p></div></aside></div>`;
+ </div><aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne générale')}<p class="fine">Sur les ${films.length} films de votre tableau.</p></div>${avoir.length?`<div class="avside"><h3>À voir</h3><p class="sub">Films non notés, avec ma note prédite.</p><div class="rows">${avoir.slice(0,12).map((r,i)=>`<button type="button" data-a="${i}"><b>${esc(r.titre)}<small>${esc(r.annee)}</small></b><span>${esc(fmtN(r.prediction))}</span></button>`).join('')}</div>${avoir.length>12?`<button type="button" class="more" data-av="1">Voir les ${avoir.length} films à voir</button>`:''}</div>`:''}</aside></div>`;
  $('q').value='';
  scrollTo({top:0,behavior:'smooth'});
 }
