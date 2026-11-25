@@ -169,7 +169,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/œ/g,'oe').replace(/[^a-z0-9]+/g,' ').replace(/\b(le|la|les|l|the|un|une|a)\b/g,' ').replace(/\s+/g,' ').trim();
 const K=['titre','note','genre','real','acteurs','annee','duree','pays','budget','recettes','imdb','themes','remarques','synopsis'];
-let films=[],idx=[],sample=null,busy=false;
+let films=[],idx=[],sample=null,busy=false,avoir=[];
 const money=v=>v==null||v===''?'Non renseigné':'$'+Math.round(v).toLocaleString('fr-FR');
 const dur=v=>{if(!v)return 'Non renseignée';const h=Math.floor(v/60),m=v%60;return h?`${h} h ${String(m).padStart(2,'0')}`:`${m} min`};
 const txt=v=>v==null||v===''?'Non renseigné':v;
@@ -340,6 +340,11 @@ function avgOf(l){return l.reduce((s,f)=>s+(+f.note||0),0)/l.length}
 const vc=f=>`<button type="button" class="vcard" data-t="${esc(f.titre)}"><b>${esc(f.titre)}</b><span class="who">${esc([f.real,f.annee].filter(Boolean).join(' · '))}</span><span class="vn"><span>${esc(fmtN(f.note))}</span><small>sur 5</small></span></button>`;
 function byNote(v){return films.filter(f=>+f.note===v)}
 function showNote(v){showList(`${fmtN(v)} sur 5`,'Note',plural(byNote(v).length),byNote(v),`Vos films notés ${fmtN(v)} sur 5`,'Du plus récent au plus ancien.')}
+const ac=(r,i)=>`<button type="button" class="vcard" data-a="${i}"><b>${esc(r.titre)}</b><span class="who">${esc([r.realisateur,r.annee].filter(Boolean).join(' · '))}</span><span class="vn"><span>${esc(fmtN(r.prediction))}</span><small>prédit</small></span></button>`;
+function showAVoir(){
+ $('out').innerHTML=`${marquee({titre:'À voir'},'',`${plural(avoir.length)} · note prédite de 3,5 à 5`)}<section class="vein" style="margin-top:44px"><h2>Les films que je vous recommande</h2><p class="sub">Classés de la note prédite la plus haute à la plus basse. Touchez un film pour voir sa fiche et la raison de la prédiction.</p><div class="vgrid">${avoir.map(ac).join('')}</div></section>`;
+ $('q').value='';scrollTo({top:0,behavior:'smooth'});
+}
 function showHome(){
  const avg=avgOf(films);
  const steps=[1,1.5,2,2.5,3,3.5,4,4.5,5],cnt=steps.map(v=>byNote(v).length),mx=Math.max(...cnt);
@@ -352,6 +357,7 @@ function showHome(){
  $('out').innerHTML=`${marquee({titre:'Le 7ème art'},'',`${films.length} films notés`)}<div class="grid home"><div>
  <section class="vein"><h2>Vos notes</h2><p class="sub">Combien de films à chaque note. Touchez une barre pour voir les films.</p><div class="hist">${hist}</div></section>
  <section class="vein"><h2>Vos coups de cœur</h2><p class="sub">Les derniers films que vous avez notés 5 sur 5.</p><div class="vgrid">${fav.slice(0,8).map(vc).join('')}</div>${fav.length>8?`<button type="button" class="more" data-n="5">Voir les ${fav.length} films notés 5 sur 5</button>`:''}</section>
+ ${avoir.length?`<section class="vein"><h2>À voir</h2><p class="sub">Des films que vous n'avez pas notés et qui devraient vous plaire, avec ma note prédite.</p><div class="vgrid">${avoir.slice(0,8).map(ac).join('')}</div>${avoir.length>8?`<button type="button" class="more" data-av="1">Voir les ${avoir.length} films à voir</button>`:''}</section>`:''}
  <section class="vein"><h2>Vos réalisateurs les plus sûrs</h2><p class="sub">Moyenne de vos notes, pour les réalisateurs dont vous avez vu au moins trois films.</p><div class="rows">${dirs.map(({p,a})=>row(`data-p="${esc(p.k)}"`,p.name,p.real.length,a)).join('')}</div></section>
  <section class="vein"><h2>Vos genres</h2><p class="sub">Moyenne de vos notes, pour les genres d'au moins cinq films.</p><div class="cols2"><div><h3>Vos préférés</h3><div class="rows">${gs.slice(0,5).map(grow).join('')}</div></div><div><h3>Vos moins aimés</h3><div class="rows">${gs.slice(-5).reverse().map(grow).join('')}</div></div></div></section>
  </div><aside class="side"><div class="medal">${disc(Math.round(avg*10)/10,'Moyenne générale')}<p class="fine">Sur les ${films.length} films de votre tableau.</p></div></aside></div>`;
@@ -359,7 +365,9 @@ function showHome(){
  scrollTo({top:0,behavior:'smooth'});
 }
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-n],[data-p],[data-g]');if(!b||!$('out').contains(b))return;
+ const b=e.target.closest('[data-n],[data-p],[data-g],[data-a],[data-av]');if(!b||!$('out').contains(b))return;
+ if(b.dataset.av){showAVoir();return}
+ if(b.dataset.a){const r=avoir[+b.dataset.a];$('q').value=r.titre;showNew(r);scrollTo({top:0,behavior:'smooth'});return}
  if(b.dataset.n)showNote(+b.dataset.n);
  else if(b.dataset.p){const p=people.find(x=>x.k===b.dataset.p);if(p){$('q').value=p.name;showPerson(p)}}
  else{const g=genres.find(x=>x.k===b.dataset.g);if(g){$('q').value=g.name;showGenre(g)}}
@@ -373,6 +381,8 @@ function search(q){
  const m=matches(q);if(m.length===1){showRated(m[0].f);$('q').value=m[0].f.titre;return}
  const pm=peopleMatches(q);if(!m.length&&pm.length===1){$('q').value=pm[0].name;showPerson(pm[0]);return}
  const ge=genres.find(g=>g.k===norm(q));if(ge){showGenre(ge);return}
+ {const n=norm(q),r=avoir.find(r=>norm(r.titre)===n||norm(r.titre_original)===n);if(r){showNew(r);return}}
+ if(['a voir','avoir','a regarder'].includes(norm(q))){showAVoir();return}
  if(!m.length&&!pm.length){const tf=themeFilms(q);if(tf.length){showTheme(q,tf);return}}
  if(sample)ask(q);else showEmpty(q,'Ce film n\'est pas dans votre tableau.');
 }
@@ -415,7 +425,7 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  $('chips').innerHTML=`<div class="track"><div class="belt">${one}<div aria-hidden="true" style="display:flex">${one.replace(/<button /g,'<button tabindex="-1" ')}</div></div></div>`;
  requestAnimationFrame(()=>{const b=document.querySelector('.belt');b.style.setProperty('--dur',(b.scrollWidth/2/45).toFixed(0)+'s')});
  $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;b.blur();const tr=b.closest('.track');tr.classList.add('run');tr.onmouseleave=()=>tr.classList.remove('run');const f=films[+b.dataset.i];$('q').value=f.titre;showRated(f)};
- showHome();
+ Promise.resolve(fetch('avoir.json').then(r=>r.json()).catch(()=>[])).then(a=>{avoir=a||[];showHome()});
 }).catch(()=>{$('out').innerHTML='<div class="empty"><h1>Tableau indisponible</h1><p>La liste des films n\'a pas pu être chargée. Rechargez la page.</p></div>'});
 
 Promise.resolve(window.claude?.use?.('sample')).then(s=>{sample=s||null}).catch(()=>{sample=null});
