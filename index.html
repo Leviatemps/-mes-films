@@ -412,6 +412,7 @@ Classe les films de la note prédite la plus haute à la plus basse. Tout le tex
   const m=String(res.text||'').match(/\{[\s\S]*\}/);
   const r=JSON.parse(m?m[0]:res.text);
   recos=(r.films||[]).filter(x=>x&&x.titre&&!find(x.titre)&&!(x.titre_original&&find(x.titre_original)));
+  recos=recos.map((x,i)=>({x,i})).sort((a,b)=>(+b.x.prediction||0)-(+a.x.prediction||0)||a.i-b.i).map(o=>o.x);
   if(!recos.length){showEmpty(q,'Claude n\'a pas trouvé de film à proposer. Reformulez votre demande.');return}
   $('out').innerHTML=`${marquee({titre:'Vos recos'},'',q)}<section class="vein" style="margin-top:44px"><h2>Ma sélection</h2><p class="sub">${esc(r.intro||'')} Touchez un film pour voir sa fiche complète.</p><div class="vgrid">${recos.map(rc).join('')}</div></section>`;
   scrollTo({top:0,behavior:'smooth'});
