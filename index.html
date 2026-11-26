@@ -125,6 +125,7 @@ dd{margin:2px 0 0}
 .more{margin-top:16px;background:none;border:0;color:var(--gold2);font:600 15px/1 'Josefin Sans',sans-serif;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--gold)}
 .more:hover{color:var(--ivory)}
 .brand{cursor:pointer}
+.vcard .why{display:block;font-size:14px;line-height:1.45;color:var(--mute);margin:8px 0 2px;font-weight:400}
 .home .side{position:static}
 .avside{margin-top:36px;padding-top:26px;border-top:1px solid var(--line)}
 .avside h3{font:700 22px/1.15 'Josefin Sans',sans-serif;color:var(--gold2);margin:0 0 4px}
@@ -147,7 +148,7 @@ dd{margin:2px 0 0}
 .grid{margin-top:28px;gap:24px}
 .sugg li{flex-direction:column;gap:2px;padding:10px}.sugg small{white-space:normal;font-size:13px}
 .facts{grid-template-columns:1fr 1fr;gap:0 18px}.facts dd{font-size:16px}
-.vgrid{grid-template-columns:1fr 1fr;gap:10px}.vcard{padding:12px 12px 10px;min-height:0}.vcard b{font-size:16px}.vcard .who{font-size:13px}.vcard .vn span{font-size:22px}.vcard .vn small{font-size:12px}
+.vgrid{grid-template-columns:1fr 1fr;gap:10px}.vgrid:has(.reco){grid-template-columns:1fr}.vcard{padding:12px 12px 10px;min-height:0}.vcard b{font-size:16px}.vcard .who{font-size:13px}.vcard .vn span{font-size:22px}.vcard .vn small{font-size:12px}
 .hist{height:150px;gap:4px}.hist span{font-size:16px}.hist em{font-size:12px}
 .chip{font-size:14px;padding:0 8px;min-height:36px}
 .home .vein+.vein,.vein{margin-top:40px}.vein h2{font-size:22px}}
@@ -371,8 +372,9 @@ function showHome(){
  scrollTo({top:0,behavior:'smooth'});
 }
 document.addEventListener('click',e=>{
- const b=e.target.closest('[data-n],[data-p],[data-g],[data-a],[data-av]');if(!b||!$('out').contains(b))return;
+ const b=e.target.closest('[data-n],[data-p],[data-g],[data-a],[data-av],[data-r]');if(!b||!$('out').contains(b))return;
  if(b.dataset.av){showAVoir();return}
+ if(b.dataset.r){const r=recos[+b.dataset.r],n=norm(r.titre),a=avoir.find(x=>norm(x.titre)===n);$('q').value=r.titre;if(a)showNew(a);else ask(r.titre_original&&r.titre_original!==r.titre?`${r.titre} (${r.titre_original}, ${r.annee||''})`:`${r.titre} (${r.annee||''})`);return}
  if(b.dataset.a){const r=avoir[+b.dataset.a];$('q').value=r.titre;showNew(r);scrollTo({top:0,behavior:'smooth'});return}
  if(b.dataset.n)showNote(+b.dataset.n);
  else if(b.dataset.p){const p=people.find(x=>x.k===b.dataset.p);if(p){$('q').value=p.name;showPerson(p)}}
@@ -380,9 +382,49 @@ document.addEventListener('click',e=>{
 });
 $('home').addEventListener('click',showHome);
 $('home').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();showHome()}});
+function isQuestion(q){
+ const n=String(q).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim(),w=n.split(' ').length;
+ if(q.includes('?'))return true;
+ if(/\b(recommand|conseill|propos|sugger|sugg|envie|reco|recos|idee|idees|ce soir|dans le style|dans la veine|du meme genre|similaire|ressemble|qui pourrai|qui devrai|je cherche|je voudrais|j aimerais|donne moi|trouve moi)/.test(n))return true;
+ return w>=4&&/^(un|une|des|quel|quels|quelle|quelles|que|qu|film|films|comedie|comedies|thriller|thrillers|drame|drames)\b/.test(n)&&/\b(avec|sur|pour|comme|qui|ou|dont|ou)\b/.test(n);
+}
+let recos=[];
+const rc=(r,i)=>`<button type="button" class="vcard reco" data-r="${i}"><b>${esc(r.titre)}</b><span class="who">${esc([r.realisateur,r.annee].filter(Boolean).join(' · '))}</span><span class="why">${esc(r.raison||'')}</span><span class="vn"><span>${esc(fmtN(r.prediction))}</span><small>prédit</small></span></button>`;
+async function askReco(q){
+ if(!sample){showEmpty(q,'Les recommandations à la demande fonctionnent dans l\'interface Claude. Ici, essayez un titre, une personne ou un thème.');return}
+ if(busy)return;busy=true;$('go').disabled=true;
+ $('out').innerHTML=`<div class="load"><div class="dots"><i></i><i></i><i></i></div>Claude cherche des films pour « ${esc(q)} »…</div>`;
+ const liste=films.map(f=>`${f.titre} (${f.annee??'?'}) : ${f.note}`).join('\n');
+ const prompt=`Un cinéphile francophone te demande des recommandations de films.
+Sa demande : « ${q} »
+
+${PROFIL}
+
+Ses ${films.length} films déjà notés (ne les recommande pas) :
+${liste}
+
+Propose 8 films qui répondent à sa demande et qu'il n'a pas encore notés, en privilégiant ceux qui devraient lui plaire selon son profil. Si sa demande porte sur des films qu'il n'aimerait pas, respecte-la.
+Réponds uniquement avec un objet JSON, sans texte autour :
+{"intro":"une phrase en français qui reformule ce que tu as compris de la demande","films":[{"titre":"titre français usuel","titre_original":"","realisateur":"","annee":nombre,"prediction":note prédite de 1 à 5 par pas de 0,5,"raison":"une phrase courte qui relie le film à la demande et à ses goûts, en citant si possible un film de sa liste"}]}
+Classe les films de la note prédite la plus haute à la plus basse. Tout le texte est en français.`;
+ try{
+  const res=await sample(prompt,{modelTier:'default'});
+  const m=String(res.text||'').match(/\{[\s\S]*\}/);
+  const r=JSON.parse(m?m[0]:res.text);
+  recos=(r.films||[]).filter(x=>x&&x.titre&&!find(x.titre)&&!(x.titre_original&&find(x.titre_original)));
+  if(!recos.length){showEmpty(q,'Claude n\'a pas trouvé de film à proposer. Reformulez votre demande.');return}
+  $('out').innerHTML=`${marquee({titre:'Vos recos'},'',q)}<section class="vein" style="margin-top:44px"><h2>Ma sélection</h2><p class="sub">${esc(r.intro||'')} Touchez un film pour voir sa fiche complète.</p><div class="vgrid">${recos.map(rc).join('')}</div></section>`;
+  scrollTo({top:0,behavior:'smooth'});
+ }catch(e){
+  const msg=e&&e.code==='not_granted'?'Vous n\'avez pas autorisé cette page à interroger Claude.':e&&e.code==='rate_limited'?'Trop de demandes pour le moment. Réessayez dans un instant.':'Les recommandations n\'ont pas pu être préparées. Réessayez.';
+  $('out').innerHTML=`<div class="empty"><h1>${esc(q)}</h1><p>${esc(msg)}</p><button id="ask" class="btn" type="button">Réessayer</button></div>`;
+  $('ask').onclick=()=>{busy=false;askReco(q)};
+ }finally{busy=false;$('go').disabled=false}
+}
 function search(q){
  q=q.trim();if(!q)return;hideSugg();$('q').blur();
  const hit=find(q);if(hit){showRated(hit.f);return}
+ if(isQuestion(q)){askReco(q);return}
  const pe=people.find(p=>p.k===norm(q));if(pe){showPerson(pe);return}
  const m=matches(q);if(m.length===1){showRated(m[0].f);$('q').value=m[0].f.titre;return}
  const pm=peopleMatches(q);if(!m.length&&pm.length===1){$('q').value=pm[0].name;showPerson(pm[0]);return}
@@ -434,7 +476,7 @@ fetch('films.json').then(r=>r.json()).then(d=>{
  Promise.resolve(fetch('avoir.json').then(r=>r.json()).catch(()=>[])).then(a=>{avoir=a||[];showHome()});
 }).catch(()=>{$('out').innerHTML='<div class="empty"><h1>Tableau indisponible</h1><p>La liste des films n\'a pas pu être chargée. Rechargez la page.</p></div>'});
 
-Promise.resolve(window.claude?.use?.('sample')).then(s=>{sample=s||null}).catch(()=>{sample=null});
+Promise.resolve(window.claude?.use?.('sample')).then(s=>{sample=s||null;if(sample&&!matchMedia('(max-width:560px)').matches)$('q').placeholder='Un film, une personne, un thème ou une envie'}).catch(()=>{sample=null});
 }
 </script>
 </body>
